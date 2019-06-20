@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var passedMessage string
+
 var dad = []string{
 	"Did you hear the one about the guy with the broken hearing aid? Neither did he.",
 	"What do you call a fly without wings? A walk.",
@@ -38,9 +40,15 @@ func getJoke(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(dj)
 }
 
+// Message function
+func putMessage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, passedMessage)
+}
+
 func main() {
 
 	customPort := flag.Int("port", 5309, "Define custom port")
+	customMessage := flag.String("message", "", "Enter custom message")
 	flag.Parse()
 
 	// Init router
@@ -50,9 +58,15 @@ func main() {
 	r.HandleFunc("/ping", getPong).Methods("GET")
 	r.HandleFunc("/v1/joke", getJoke).Methods("GET")
 
+	// CustomPort error handling
 	if *customPort <= 1024 || *customPort >= 65534 {
 		fmt.Println("Invalid port: please enter a value between 1025 and 65533")
 		os.Exit(1)
+	}
+
+	if *customMessage != "" {
+		passedMessage = *customMessage
+		r.HandleFunc("/message", putMessage).Methods("GET")
 	}
 
 	port := fmt.Sprintf(":%v", *customPort)
