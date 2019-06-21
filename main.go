@@ -12,6 +12,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Number struct
+type Number struct {
+	Number1 int `json: "number1"`
+	Number2 int `json: "number2"`
+}
+
+var numbers []Number
 var passedMessage string
 
 var dad = []string{
@@ -41,11 +48,26 @@ func getJoke(w http.ResponseWriter, r *http.Request) {
 }
 
 // Message function
-func putMessage(w http.ResponseWriter, r *http.Request) {
+func setMessage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, passedMessage)
 }
 
+// AddValue function
+func addValues(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var num Number
+	_ = json.NewDecoder(r.Body).Decode(&num)
+	numbers = append(numbers, num)
+	json.NewEncoder(w).Encode(num.Number1 + num.Number2)
+}
+
 func main() {
+
+	// mock data
+	numbers = append(numbers, Number{
+		Number1: 1,
+		Number2: 3,
+	})
 
 	customPort := flag.Int("port", 5309, "Define custom port")
 	customMessage := flag.String("message", "", "Enter custom message")
@@ -57,16 +79,18 @@ func main() {
 	// Route Handlers / Endpoints
 	r.HandleFunc("/ping", getPong).Methods("GET")
 	r.HandleFunc("/v1/joke", getJoke).Methods("GET")
+	r.HandleFunc("/transform", addValues).Methods("POST")
 
-	// CustomPort error handling
+	// CustomPort: error handling and verification of port params
 	if *customPort <= 1024 || *customPort >= 65534 {
 		fmt.Println("Invalid port: please enter a value between 1025 and 65533")
 		os.Exit(1)
 	}
 
+	// CustomMessage: takes passed value and passes to global variable
 	if *customMessage != "" {
 		passedMessage = *customMessage
-		r.HandleFunc("/message", putMessage).Methods("GET")
+		r.HandleFunc("/message", setMessage).Methods("GET")
 	}
 
 	port := fmt.Sprintf(":%v", *customPort)
