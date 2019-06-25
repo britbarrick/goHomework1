@@ -43,7 +43,7 @@ func getPong(w http.ResponseWriter, r *http.Request) {
 // Random Dad Joke Switcher -- TODO: place http req to canhazdadjoke
 func getJoke(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	dj := dad[rand.Intn(10)]
+	dj := dad[rand.Intn(len(dad))]
 	json.NewEncoder(w).Encode(dj)
 }
 
