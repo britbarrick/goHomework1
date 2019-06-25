@@ -94,7 +94,7 @@ func main() {
 	}
 
 	port := fmt.Sprintf(":%v", *customPort)
-	fmt.Println("Webserver started on port", port)
+	fmt.Println("Webserver started on default port -- 5309 unless otherwise specified.")
 	log.Fatal(http.ListenAndServe(port, r))
 
 }
