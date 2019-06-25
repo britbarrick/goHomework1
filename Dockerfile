@@ -17,5 +17,7 @@ FROM alpine
 #Copy the compiled file from the base image to the final image
 COPY --from=GOLANG-BUILDER /hwassign/main /app/main
 
+EXPOSE 5309
+
 #Set the default entry point
 CMD ["/app/main"]
